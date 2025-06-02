@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const axios = require("axios");
-const { Configuration, OpenAIApi } = require("openai");
+const OpenAI = require("openai");
 
 const app = express();
 app.use(express.json());
@@ -10,11 +10,9 @@ const PAGE_ID = process.env.FB_PAGE_ID;
 const ACCESS_TOKEN = process.env.FB_USER_ACCESS_TOKEN;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-const openai = new OpenAIApi(
-  new Configuration({
-    apiKey: OPENAI_API_KEY,
-  })
-);
+const openai = new OpenAI({
+  apiKey: OPENAI_API_KEY,
+});
 
 // Fetch latest comments
 async function checkCommentsAndReply() {
@@ -36,12 +34,12 @@ async function checkCommentsAndReply() {
         console.log(`💬 Comment: ${message}`);
 
         // Generate reply using ChatGPT
-        const response = await openai.createChatCompletion({
+        const response = await openai.chat.completions.create({
           model: "gpt-3.5-turbo",
           messages: [{ role: "user", content: message }],
         });
 
-        const reply = response.data.choices[0].message.content;
+        const reply = response.choices[0].message.content;
         console.log(`🧠 Reply: ${reply}`);
 
         // Post reply back to the comment
